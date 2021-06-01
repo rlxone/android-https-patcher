@@ -243,7 +243,7 @@ class Rebuilder:
                 sp = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
                 keytool = sp.communicate()[0].decode('utf-8').strip('\n')
                 shell = True
-            elif is_os_macos():
+            elif self.__utils.is_os_macos():
                 keytool = 'keytool'
                 shell = False
             subprocess.call([keytool, '-genkey', '-v', '-keystore', filename, '-keyalg', 'RSA', '-keysize', '2048', '-validity', '10000'], shell=shell)
@@ -258,7 +258,7 @@ class Rebuilder:
         elif self.__utils.is_os_macos():
             command = 'find ~/Library/Android/sdk/build-tools -name zipalign'
         sp = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
-        return sp.communicate()[0].decode('utf-8').strip('\n')
+        return sp.communicate()[0].decode('utf-8').split('\n')[0]
 
     def __get_apksigner_path(self):
         command = None
@@ -267,7 +267,7 @@ class Rebuilder:
         elif self.__utils.is_os_macos():
             command = 'find ~/Library/Android/sdk/build-tools -name apksigner'
         sp = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
-        return sp.communicate()[0].decode('utf-8').strip('\n')
+        return sp.communicate()[0].decode('utf-8').split('\n')[0]
 
 # MAIN
 

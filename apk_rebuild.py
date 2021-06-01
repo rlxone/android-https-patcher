@@ -244,7 +244,7 @@ class Rebuilder:
                 keytool = sp.communicate()[0].decode('utf-8').strip('\n')
                 shell = True
             elif self.__utils.is_os_macos():
-                keytool = 'keytool'
+                keytool = '/Applications/Android Studio.app/Contents/jre/jdk/Contents/Home/bin/keytool'
                 shell = False
             subprocess.call([keytool, '-genkey', '-v', '-keystore', filename, '-keyalg', 'RSA', '-keysize', '2048', '-validity', '10000'], shell=shell)
 

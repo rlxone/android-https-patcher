@@ -102,6 +102,10 @@ class Utils:
         with open(filename,'w') as f:
             f.write(content)
 
+    def makedirs(self, filename):
+        dirname = os.path.dirname(filename)
+        os.makedirs(dirname, exist_ok=True)
+
     def file_exists(self, filename):
         return os.path.isfile(filename)
 
@@ -244,11 +248,12 @@ class Rebuilder:
                 keytool = sp.communicate()[0].decode('utf-8').strip('\n')
                 shell = True
             elif self.__utils.is_os_macos():
-                keytool = '/Applications/Android Studio.app/Contents/jre/jdk/Contents/Home/bin/keytool'
+                keytool = 'keytool'
                 shell = False
             subprocess.call([keytool, '-genkey', '-v', '-keystore', filename, '-keyalg', 'RSA', '-keysize', '2048', '-validity', '10000'], shell=shell)
 
     def __create_network_security_xml(self, filename, content):
+        self.__utils.makedirs(filename)
         self.__utils.write_to_file(filename, content)
 
     def __get_zipalign_path(self):

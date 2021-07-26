@@ -102,6 +102,10 @@ class Utils:
         with open(filename,'w') as f:
             f.write(content)
 
+    def makedirs(self, filename):
+        dirname = os.path.dirname(filename)
+        os.makedirs(dirname, exist_ok=True)
+
     def file_exists(self, filename):
         return os.path.isfile(filename)
 
@@ -243,12 +247,13 @@ class Rebuilder:
                 sp = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
                 keytool = sp.communicate()[0].decode('utf-8').strip('\n')
                 shell = True
-            elif is_os_macos():
+            elif self.__utils.is_os_macos():
                 keytool = 'keytool'
                 shell = False
             subprocess.call([keytool, '-genkey', '-v', '-keystore', filename, '-keyalg', 'RSA', '-keysize', '2048', '-validity', '10000'], shell=shell)
 
     def __create_network_security_xml(self, filename, content):
+        self.__utils.makedirs(filename)
         self.__utils.write_to_file(filename, content)
 
     def __get_zipalign_path(self):
@@ -258,7 +263,7 @@ class Rebuilder:
         elif self.__utils.is_os_macos():
             command = 'find ~/Library/Android/sdk/build-tools -name zipalign'
         sp = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
-        return sp.communicate()[0].decode('utf-8').strip('\n')
+        return sp.communicate()[0].decode('utf-8').split('\n')[0]
 
     def __get_apksigner_path(self):
         command = None
@@ -267,7 +272,7 @@ class Rebuilder:
         elif self.__utils.is_os_macos():
             command = 'find ~/Library/Android/sdk/build-tools -name apksigner'
         sp = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
-        return sp.communicate()[0].decode('utf-8').strip('\n')
+        return sp.communicate()[0].decode('utf-8').split('\n')[0]
 
 # MAIN
 

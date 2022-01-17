@@ -21,7 +21,7 @@ Run python script and follow the instructions. After you've done drag output fil
 - macOS or Windows
 - [apktools](https://github.com/iBotPeaches/Apktool) (in your PATH)
 - Android Studio (with Build Tools installed)
-- Python 3
+- Python 3.6 and above
 
 ## Disclaimer
 This repo was created for educational purposes only. Use it on your own risk.  

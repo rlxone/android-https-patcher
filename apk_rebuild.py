@@ -34,6 +34,10 @@ class ProgressMessages:
         return f'Building {first} from {second}...'
 
     @staticmethod
+    def message_workaround_apktool_2756():
+        return f'Applying Apktool issue #2756 workaround...'
+
+    @staticmethod
     def message_zipalign(first, second):
         return f'Zipalign {first} to {second}...'
 
@@ -196,6 +200,8 @@ class Rebuilder:
         self.__change_manifest(manifest_filename)
         Logger.success(ProgressMessages.message_create_resources(network_security_xml))
         self.__create_network_security_xml(network_security_xml, Rebuilder.Constants.NETWORK_SECURITY_XML)
+        Logger.warning(ProgressMessages.message_workaround_apktool_2756())
+        self.__workaround_apktool_2756(unpacked_folder, manifest_filename)
         Logger.success(ProgressMessages.message_building(output_filename, unpacked_folder))
         self.__build_apk(output_filename, unpacked_folder)
         Logger.success(ProgressMessages.message_zipalign(output_filename, aligned_filename))
@@ -223,6 +229,40 @@ class Rebuilder:
     def __unpack_apk(self, input_filename, folder):
         shell = self.__utils.is_os_windows()
         subprocess.call(["apktool", "d", input_filename, "-f", "-o", folder], shell=shell)
+
+    def __workaround_apktool_2756(self, folder, manifest_filename):
+        shell = self.__utils.is_os_windows()
+
+        if shell:
+            locales_config_path = f'{folder}\\res\\xml\\locales_config.xml'
+        else:
+            locales_config_path = f'{folder}/res/xml/locales_config.xml'
+
+        if os.path.exists( locales_config_path ):
+            os.remove( locales_config_path )
+
+        if shell:
+            public_path = f'{folder}\\res\\values\\public.xml'
+        else:
+            public_path = f'{folder}/res/values/public.xml'
+
+        xmldoc = minidom.parse( public_path )
+
+        public_items = xmldoc.getElementsByTagName("public")
+
+        for item in public_items:
+            if item.getAttribute('name') == 'locales_config':
+                item.parentNode.removeChild(item)
+
+        self.__utils.write_to_file( public_path , xmldoc.toxml() )
+
+        xmldoc = minidom.parse(manifest_filename)
+        application_item = xmldoc.getElementsByTagName("application")
+
+        if application_item[0].hasAttribute('android:localeConfig'):
+            application_item[0].removeAttribute('android:localeConfig')
+
+            self.__utils.write_to_file( manifest_filename, xmldoc.toxml() )
 
     def __build_apk(self, output_filename, folder):
         shell = self.__utils.is_os_windows()

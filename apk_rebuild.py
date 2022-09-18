@@ -247,7 +247,7 @@ class Rebuilder:
                 sp = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
                 keytool = sp.communicate()[0].decode('utf-8').strip('\n')
                 shell = True
-            elif self.__utils.is_os_macos():
+            else:
                 keytool = 'keytool'
                 shell = False
             subprocess.call([keytool, '-genkey', '-v', '-keystore', filename, '-keyalg', 'RSA', '-keysize', '2048', '-validity', '10000'], shell=shell)
@@ -262,6 +262,8 @@ class Rebuilder:
             command = 'where /r %LocalAppData%\Android zipalign.exe'
         elif self.__utils.is_os_macos():
             command = 'find ~/Library/Android/sdk/build-tools -name zipalign'
+        else:
+            command = 'find ~/Android/Sdk/build-tools -name zipalign'
         sp = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
         return sp.communicate()[0].decode('utf-8').split('\n')[0]
 
@@ -271,6 +273,8 @@ class Rebuilder:
             command = 'where /r "%LocalAppData%\Android" apksigner.bat'
         elif self.__utils.is_os_macos():
             command = 'find ~/Library/Android/sdk/build-tools -name apksigner'
+        else:
+            command = 'find ~/Android/Sdk/build-tools -name apksigner'
         sp = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
         return sp.communicate()[0].decode('utf-8').split('\n')[0]
 
